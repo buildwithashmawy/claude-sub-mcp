@@ -1,0 +1,35 @@
+import { runClaudeCode } from "../services/claude-code-runner.js";
+import { parseExecuteTaskOutput } from "../services/output-parser.js";
+import { DEFAULT_MAX_TURNS, DEFAULT_TIMEOUT } from "../constants.js";
+import type { ContinueOutput } from "../types.js";
+
+interface ContinueInput {
+  instruction: string;
+  workingDirectory: string;
+  resumeConversation: boolean;
+}
+
+export async function continueTask(
+  input: ContinueInput
+): Promise<ContinueOutput> {
+  const result = await runClaudeCode({
+    prompt: input.instruction,
+    workingDirectory: input.workingDirectory,
+    continueConversation: input.resumeConversation,
+    maxTurns: DEFAULT_MAX_TURNS,
+    timeout: DEFAULT_TIMEOUT,
+  });
+
+  if (result.timedOut) {
+    return {
+      summary: `Continuation timed out after ${DEFAULT_TIMEOUT}ms.`,
+      filesCreated: [],
+      filesModified: [],
+      commandsRun: [],
+      success: false,
+      rawOutput: result.stdout || result.stderr,
+    };
+  }
+
+  return parseExecuteTaskOutput(result.stdout, result.exitCode);
+}

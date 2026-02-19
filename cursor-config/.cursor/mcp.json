@@ -1,10 +1,11 @@
 {
   "mcpServers": {
     "claude-agent": {
-      "command": "node",
-      "args": ["${__dirname}/../node_modules/claude-agent-mcp-server/dist/index.js"],
+      "command": "/opt/node22/bin/node",
+      "args": ["${__dirname}/../../dist/index.js"],
       "env": {
-        "CLAUDE_CODE_PATH": "claude"
+        "CLAUDE_CODE_PATH": "/opt/node22/bin/claude",
+        "PATH": "/opt/node22/bin:/usr/local/bin:/usr/bin:/bin"
       }
     }
   }

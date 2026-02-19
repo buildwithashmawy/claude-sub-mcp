@@ -1,3 +1,7 @@
+export interface ProgressCallback {
+  (progress: number, total: number, message: string): Promise<void>;
+}
+
 export interface ClaudeCodeRunnerOptions {
   prompt: string;
   workingDirectory: string;
@@ -6,6 +10,8 @@ export interface ClaudeCodeRunnerOptions {
   timeout?: number;
   continueConversation?: boolean;
   outputFormat?: "json" | "text";
+  onProgress?: ProgressCallback;
+  signal?: AbortSignal;
 }
 
 export interface ClaudeCodeResult {
@@ -13,6 +19,11 @@ export interface ClaudeCodeResult {
   stdout: string;
   stderr: string;
   timedOut: boolean;
+  cancelled: boolean;
+  durationMs: number;
+  sessionId?: string;
+  costUsd?: number;
+  numTurns?: number;
 }
 
 export interface ExecuteTaskOutput {
@@ -22,6 +33,9 @@ export interface ExecuteTaskOutput {
   commandsRun: string[];
   success: boolean;
   rawOutput: string;
+  durationMs: number;
+  numTurns?: number;
+  sessionId?: string;
 }
 
 export interface PlanTaskOutput {
@@ -63,3 +77,10 @@ export interface RunAndVerifyOutput {
 }
 
 export interface ContinueOutput extends ExecuteTaskOutput {}
+
+export interface ServerStatus {
+  status: "ready" | "busy" | "error";
+  activeTaskCount: number;
+  claudeCodeAvailable: boolean;
+  version: string;
+}

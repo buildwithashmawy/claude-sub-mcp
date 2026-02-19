@@ -1,7 +1,7 @@
 import { runClaudeCode } from "../services/claude-code-runner.js";
 import { parseRunAndVerifyOutput } from "../services/output-parser.js";
-import { DEFAULT_TIMEOUT } from "../constants.js";
-import type { RunAndVerifyOutput } from "../types.js";
+import { DIAGNOSTIC_TOOLS, DEFAULT_TIMEOUT } from "../constants.js";
+import type { RunAndVerifyOutput, ProgressCallback } from "../types.js";
 
 interface RunAndVerifyInput {
   command: string;
@@ -11,7 +11,9 @@ interface RunAndVerifyInput {
 }
 
 export async function runAndVerify(
-  input: RunAndVerifyInput
+  input: RunAndVerifyInput,
+  onProgress?: ProgressCallback,
+  signal?: AbortSignal,
 ): Promise<RunAndVerifyOutput> {
   const criteriaNote = input.successCriteria
     ? `\n\nSuccess criteria: ${input.successCriteria}`
@@ -29,7 +31,7 @@ export async function runAndVerify(
 
   const allowedTools = input.fixOnFailure
     ? undefined // all tools
-    : ["Bash", "Read", "Glob", "Grep"];
+    : DIAGNOSTIC_TOOLS;
 
   const result = await runClaudeCode({
     prompt,
@@ -37,6 +39,8 @@ export async function runAndVerify(
     allowedTools,
     maxTurns: input.fixOnFailure ? 40 : 10,
     timeout: DEFAULT_TIMEOUT,
+    onProgress,
+    signal,
   });
 
   if (result.timedOut) {

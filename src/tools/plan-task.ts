@@ -1,7 +1,7 @@
 import { runClaudeCode } from "../services/claude-code-runner.js";
 import { parsePlanTaskOutput } from "../services/output-parser.js";
 import { PLAN_TIMEOUT } from "../constants.js";
-import type { PlanTaskOutput } from "../types.js";
+import type { PlanTaskOutput, ProgressCallback } from "../types.js";
 
 interface PlanTaskInput {
   task: string;
@@ -9,7 +9,11 @@ interface PlanTaskInput {
   context?: string;
 }
 
-export async function planTask(input: PlanTaskInput): Promise<PlanTaskOutput> {
+export async function planTask(
+  input: PlanTaskInput,
+  onProgress?: ProgressCallback,
+  signal?: AbortSignal,
+): Promise<PlanTaskOutput> {
   const contextNote = input.context
     ? `\n\nAdditional context: ${input.context}`
     : "";
@@ -26,6 +30,8 @@ export async function planTask(input: PlanTaskInput): Promise<PlanTaskOutput> {
     allowedTools: [],
     maxTurns: 5,
     timeout: PLAN_TIMEOUT,
+    onProgress,
+    signal,
   });
 
   if (result.timedOut) {

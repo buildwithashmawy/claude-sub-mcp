@@ -1,8 +1,11 @@
 {
   "name": "claude-agent-mcp-server",
-  "version": "1.0.0",
-  "description": "MCP server that delegates coding tasks to Claude Code CLI",
+  "version": "1.1.0",
+  "description": "MCP server that delegates coding tasks to Claude Code CLI — optimized for Cursor IDE",
   "main": "dist/index.js",
+  "bin": {
+    "claude-agent-mcp-server": "dist/index.js"
+  },
   "type": "module",
   "scripts": {
     "build": "tsc",

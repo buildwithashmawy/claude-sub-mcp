@@ -1,7 +1,7 @@
 import { runClaudeCode } from "../services/claude-code-runner.js";
 import { parseDebugOutput } from "../services/output-parser.js";
 import { READ_ONLY_TOOLS, DEFAULT_TIMEOUT } from "../constants.js";
-import type { DebugOutput } from "../types.js";
+import type { DebugOutput, ProgressCallback } from "../types.js";
 
 interface DebugInput {
   error: string;
@@ -10,7 +10,11 @@ interface DebugInput {
   relatedFiles?: string[];
 }
 
-export async function debugError(input: DebugInput): Promise<DebugOutput> {
+export async function debugError(
+  input: DebugInput,
+  onProgress?: ProgressCallback,
+  signal?: AbortSignal,
+): Promise<DebugOutput> {
   const relatedFilesNote =
     input.relatedFiles && input.relatedFiles.length > 0
       ? `\n\nRelated files to examine:\n${input.relatedFiles.map((f) => `- ${f}`).join("\n")}`
@@ -38,6 +42,8 @@ export async function debugError(input: DebugInput): Promise<DebugOutput> {
     allowedTools,
     maxTurns: input.autoFix ? 30 : 10,
     timeout: DEFAULT_TIMEOUT,
+    onProgress,
+    signal,
   });
 
   if (result.timedOut) {

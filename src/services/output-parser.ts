@@ -1,4 +1,5 @@
 import type {
+  ClaudeCodeResult,
   ExecuteTaskOutput,
   PlanTaskOutput,
   ReviewCodeOutput,
@@ -52,7 +53,7 @@ function extractFilesFromText(
 
 export function parseExecuteTaskOutput(
   raw: string,
-  exitCode: number
+  result: ClaudeCodeResult
 ): ExecuteTaskOutput {
   const resultText = extractResultText(raw);
 
@@ -74,8 +75,11 @@ export function parseExecuteTaskOutput(
     filesCreated,
     filesModified,
     commandsRun,
-    success: exitCode === 0,
+    success: result.exitCode === 0,
     rawOutput: raw,
+    durationMs: result.durationMs,
+    numTurns: result.numTurns,
+    sessionId: result.sessionId,
   };
 }
 

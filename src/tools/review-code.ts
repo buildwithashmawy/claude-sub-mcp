@@ -1,7 +1,7 @@
 import { runClaudeCode } from "../services/claude-code-runner.js";
 import { parseReviewCodeOutput } from "../services/output-parser.js";
 import { READ_ONLY_TOOLS, REVIEW_TIMEOUT } from "../constants.js";
-import type { ReviewCodeOutput } from "../types.js";
+import type { ReviewCodeOutput, ProgressCallback } from "../types.js";
 
 interface ReviewCodeInput {
   target: string;
@@ -21,7 +21,9 @@ const FOCUS_INSTRUCTIONS: Record<string, string> = {
 };
 
 export async function reviewCode(
-  input: ReviewCodeInput
+  input: ReviewCodeInput,
+  onProgress?: ProgressCallback,
+  signal?: AbortSignal,
 ): Promise<ReviewCodeOutput> {
   const focusInstruction = FOCUS_INSTRUCTIONS[input.focus] || FOCUS_INSTRUCTIONS.all;
 
@@ -41,6 +43,8 @@ export async function reviewCode(
     allowedTools: READ_ONLY_TOOLS,
     maxTurns: 20,
     timeout: REVIEW_TIMEOUT,
+    onProgress,
+    signal,
   });
 
   if (result.timedOut) {

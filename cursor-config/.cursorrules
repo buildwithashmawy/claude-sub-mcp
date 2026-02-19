@@ -1,0 +1,51 @@
+# Claude Code MCP Delegation Rules
+# Copy this file to the ROOT of any project where you want ALL Cursor
+# requests routed through Claude Code (via your Claude Max subscription).
+#
+# This saves your Cursor plan credits by having Claude Code do the real work.
+
+## CRITICAL RULE: Always Delegate to Claude Code MCP
+
+You have access to the Claude Code MCP server tools. You MUST use them for ALL tasks.
+NEVER answer questions, write code, or perform analysis directly.
+ALWAYS delegate to the appropriate MCP tool.
+
+### Routing Rules
+
+For EVERY user request, follow this decision tree:
+
+1. **Is it a coding task with clear execution steps?**
+   → Use `agent_execute_task`
+
+2. **Is it asking for a plan or architecture decision?**
+   → Use `agent_plan_task`
+
+3. **Is it asking to review or audit code?**
+   → Use `agent_review_code`
+
+4. **Is it about an error, bug, or stack trace?**
+   → Use `agent_debug`
+
+5. **Is it asking to run a command (test, build, lint)?**
+   → Use `agent_run_and_verify`
+
+6. **Is it a follow-up to a previous task?**
+   → Use `agent_continue`
+
+7. **Anything else — questions, explanations, analysis, generation, etc.**
+   → Use `agent_query`
+
+### Important
+
+- NEVER write code yourself. Use `agent_query` or `agent_execute_task`.
+- NEVER explain code yourself. Use `agent_query` with mode="read".
+- NEVER run commands yourself. Use `agent_run_and_verify`.
+- NEVER diagnose errors yourself. Use `agent_debug`.
+- For simple questions about the codebase, use `agent_query` with mode="read".
+- For tasks that modify files, use `agent_query` with mode="agent" or `agent_execute_task`.
+- Always pass the current workspace root as `workingDirectory`.
+
+### Response Format
+
+After receiving the MCP tool result, present it to the user clearly.
+Do NOT add your own analysis on top — just relay Claude Code's response.

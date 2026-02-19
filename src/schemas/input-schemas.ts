@@ -106,3 +106,39 @@ export const continueSchema = {
     .default(true)
     .describe("Whether to continue the last conversation"),
 };
+
+export const querySchema = {
+  prompt: z
+    .string()
+    .min(1)
+    .describe(
+      "Any question, request, or instruction. This is the catch-all — " +
+      "use it for anything: code questions, explanations, generation, " +
+      "refactoring, analysis, writing tests, or any other task."
+    ),
+  workingDirectory: z
+    .string()
+    .min(1)
+    .describe("Absolute path to the project directory for context"),
+  mode: z
+    .enum(["read", "edit", "agent"])
+    .default("agent")
+    .describe(
+      "Execution mode: " +
+      "'read' = only read files, no modifications (cheapest); " +
+      "'edit' = can read and edit files but no shell commands; " +
+      "'agent' = full autonomy with all tools (default)"
+    ),
+  maxTurns: z
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe("Maximum agentic turns (default: 50 for agent, 10 for read/edit)"),
+  timeout: z
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe("Timeout in milliseconds (default: 300000)"),
+};

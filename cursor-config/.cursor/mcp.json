@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "claude-agent": {
+      "command": "node",
+      "args": ["${__dirname}/../node_modules/claude-agent-mcp-server/dist/index.js"],
+      "env": {
+        "CLAUDE_CODE_PATH": "claude"
+      }
+    }
+  }
+}

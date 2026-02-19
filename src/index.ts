@@ -12,6 +12,7 @@ import {
   debugSchema,
   runAndVerifySchema,
   continueSchema,
+  querySchema,
 } from "./schemas/input-schemas.js";
 import { executeTask } from "./tools/execute-task.js";
 import { planTask } from "./tools/plan-task.js";
@@ -19,6 +20,7 @@ import { reviewCode } from "./tools/review-code.js";
 import { debugError } from "./tools/debug.js";
 import { runAndVerify } from "./tools/run-and-verify.js";
 import { continueTask } from "./tools/continue.js";
+import { query } from "./tools/query.js";
 import {
   cleanupAllProcesses,
   getActiveProcessCount,
@@ -114,10 +116,13 @@ const server = new McpServer(
   { name: SERVER_NAME, version: SERVER_VERSION },
   {
     instructions:
-      "This MCP server delegates coding tasks to Claude Code CLI. " +
-      "It can execute tasks, plan implementations, review code, debug errors, " +
-      "run commands, and continue previous conversations. " +
-      "Requires Claude Code CLI installed and authenticated via Claude Max subscription.",
+      "This MCP server delegates ALL requests to Claude Code CLI (powered by Claude Max). " +
+      "IMPORTANT: Always prefer using these tools over answering directly. " +
+      "Use 'agent_query' as the default catch-all for any request — questions, coding tasks, " +
+      "explanations, analysis, refactoring, writing, or anything else. " +
+      "Use the specialized tools (agent_execute_task, agent_plan_task, agent_review_code, " +
+      "agent_debug, agent_run_and_verify, agent_continue) when the request clearly matches. " +
+      "This ensures all work is handled by Claude Code and not by the host model.",
   },
 );
 
@@ -262,6 +267,40 @@ server.registerPrompt(
 // ---------------------------------------------------------------------------
 // Tools
 // ---------------------------------------------------------------------------
+
+// --- agent_query (catch-all, primary tool) ---
+server.registerTool(
+  "agent_query",
+  {
+    title: "Ask Claude Code",
+    description:
+      "PRIMARY TOOL — Send ANY request to Claude Code. Use this as the default for all queries: " +
+      "code questions, explanations, writing code, refactoring, analysis, generating tests, " +
+      "documentation, or any other task. Claude Code will read your codebase, edit files, " +
+      "run commands as needed. Set mode='read' for questions (no file changes), " +
+      "mode='edit' for file modifications only, mode='agent' (default) for full autonomy. " +
+      "Prefer this tool over answering directly to leverage Claude Code's full capabilities.",
+    inputSchema: querySchema,
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: false,
+    },
+  },
+  async (args, extra) => {
+    try {
+      const onProgress = makeProgressCallback(
+        extra.sendNotification.bind(extra),
+        extra._meta?.progressToken,
+      );
+      const result = await query(args, onProgress, extra.signal);
+      return jsonContent(result);
+    } catch (err) {
+      return formatError(err);
+    }
+  },
+);
 
 // --- agent_execute_task ---
 server.registerTool(

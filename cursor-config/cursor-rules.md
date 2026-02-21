@@ -1,8 +1,8 @@
 # Claude Code MCP Delegation Rules
-# Copy this file to the ROOT of any project where you want ALL Cursor
-# requests routed through Claude Code (via your Claude Max subscription).
-#
-# This saves your Cursor plan credits by having Claude Code do the real work.
+
+Paste the rules below into **Cursor Settings > General > Rules for AI** to apply
+them globally across all projects. This ensures every request is routed through
+Claude Code (via your Claude Max subscription) instead of burning Cursor credits.
 
 ## CRITICAL RULE: Always Delegate to Claude Code MCP
 

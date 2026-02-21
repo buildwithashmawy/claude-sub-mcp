@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "claude-agent": {
+      "command": "/absolute/path/to/node",
+      "args": ["/absolute/path/to/claude-sub-mcp/dist/index.js"],
+      "env": {
+        "CLAUDE_CODE_PATH": "/absolute/path/to/claude",
+        "PATH": "/usr/local/bin:/usr/bin:/bin"
+      }
+    }
+  }
+}

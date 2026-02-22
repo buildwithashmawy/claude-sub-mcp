@@ -4,19 +4,23 @@
   "description": "MCP server that delegates coding tasks to Claude Code CLI — optimized for Cursor IDE",
   "main": "dist/index.js",
   "bin": {
-    "claude-agent-mcp-server": "dist/index.js"
+    "claude-agent-mcp-server": "dist/index.js",
+    "claude-agent-openai-server": "dist/server.js"
   },
   "type": "module",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
+    "start:openai": "node dist/server.js",
     "dev": "tsc --watch"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
+    "express": "^5.2.1",
     "zod": "^3.23.0"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/node": "^22.0.0",
     "typescript": "^5.7.0"
   }
